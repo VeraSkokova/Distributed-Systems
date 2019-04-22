@@ -1,0 +1,42 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+application {
+    mainClassName = 'ru.nsu.ccfit.skokova.task1.subtask1.Main'
+}
+
+group 'ru.nsu.ccfit'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+
+    /*Log4j & SLF4J*/
+    compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.11.2'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.11.2'
+    compile 'org.slf4j:slf4j-api:1.7.21'
+
+    /*Apache Commons Compress*/
+    compile 'org.apache.commons:commons-compress:1.18'
+    
+    /*Apache Commons Cli*/
+    compile group: 'commons-cli', name: 'commons-cli', version: '1.4'
+
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'ru.nsu.ccfit.skokova.task1.subtask1.Main'
+    }
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
