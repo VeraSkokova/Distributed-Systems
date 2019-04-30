@@ -3,6 +3,7 @@ package ru.nsu.ccfit.skokova.project;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapperResultSetExtractor;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.stereotype.Repository;
 import ru.nsu.ccfit.skokova.project.generated.Node;
@@ -92,5 +93,19 @@ public class OsmDao extends JdbcDaoSupport {
                 return tags.size();
             }
         });
+    }
+
+    public List<Node> getNearNodes(double lat, double lon, int distance) {
+        String query = "select node.lat as lat, node.lon as lon from node " +
+                "where earth_box(ll_to_earth(?, ?), ?) @> earth_box(ll_to_earth(lat, lon), 1)\n" +
+                "  AND earth_distance(ll_to_earth(?, ?), ll_to_earth(lat, lon)) < ?";
+        return jdbcTemplate.query(query,
+                new Object[]{lat, lon, distance, lat, lon, distance},
+                new RowMapperResultSetExtractor<>((rs, rowNum) -> {
+                    Node node = new Node();
+                    node.setLat(rs.getDouble("lat"));
+                    node.setLon(rs.getDouble("lon"));
+                    return node;
+                }));
     }
 }
